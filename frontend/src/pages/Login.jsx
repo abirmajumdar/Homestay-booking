@@ -1,89 +1,104 @@
-import axios from "axios";
 import React, { useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { BACKEND_URL } from "../utils/utils";
+import { toast } from "react-hot-toast";
+import { AiOutlineClose } from "react-icons/ai"; // Cross icon
 
 export default function Login() {
-    const [email,setEmail] = useState()
-    const [password,setPassword] = useState()
-    const Navigate = useNavigate()
-    const loginForm=async(e)=>{
-        e.preventDefault()
-        console.log("login")
-        console.log({email,password});
-        try{
-            const res = await axios.post('http://localhost:4000/user/login',{email,password})
-            console.log(res)
-            localStorage.setItem("User",JSON.stringify(res.data.user))
-            Navigate('/')
-        }
-        catch(e){
-            console.log(e)
-        }
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const Navigate = useNavigate();
+
+  const validateInputs = () => {
+    if (!email || !password) {
+      toast.error("Please fill in all fields.");
+      return false;
     }
-    return (
-        <div>
-            <div className="flex flex-col items-center min-h-screen pt-6 sm:justify-center sm:pt-0 bg-gray-50">
-                <div>
-                    <a href="/">
-                        <h3 className="text-4xl font-bold text-purple-600">
-                            Logo
-                        </h3>
-                    </a>
-                </div>
-                <div className="w-full px-6 py-4 mt-6 overflow-hidden bg-white shadow-md sm:max-w-md sm:rounded-lg">
-                    <form>
-                       
-                        <div className="mt-4">
-                            <label
-                                htmlFor="email"
-                                className="block text-sm font-medium text-gray-700 undefined"
-                            >
-                                Email
-                            </label>
-                            <div className="flex flex-col items-start">
-                                <input
-                                    type="email"
-                                    name="email"
-                                    value={email} onChange={(e)=>{setEmail(e.target.value)}}
-                                    className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                />
-                            </div>
-                        </div>
-                        <div className="mt-4">
-                            <label
-                                htmlFor="password"
-                                className="block text-sm font-medium text-gray-700 undefined"
-                            >
-                                Password
-                            </label>
-                            <div className="flex flex-col items-start">
-                                <input
-                                    value={password}
-                                    onChange={(e)=>{setPassword(e.target.value)}}
-                                    type="password"
-                                    name="password"
-                                    className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                />
-                            </div>
-                        </div>
-                        
-                        <div className="flex items-center justify-end mt-4">
-                            <a
-                                className="text-sm text-gray-600 underline hover:text-gray-900"
-                                href="/register"
-                            >
-                                Not registered?
-                            </a>
-                            <button
-                                onClick={loginForm}
-                                className="inline-flex items-center px-4 py-2 ml-4 text-xs font-semibold tracking-widest text-white uppercase transition duration-150 ease-in-out bg-gray-900 border border-transparent rounded-md active:bg-gray-900 false"
-                            >
-                                Login
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    );
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Please enter a valid email.");
+      return false;
+    }
+
+    return true;
+  };
+
+  const loginForm = async (e) => {
+    e.preventDefault();
+
+    if (!validateInputs()) return;
+
+    try {
+      const res = await axios.post(`${BACKEND_URL}/user/login`, {
+        email,
+        password,
+      });
+
+      localStorage.setItem("User", JSON.stringify(res.data.user));
+      toast.success("Login successful!");
+      Navigate("/");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.error || "Invalid credentials. Please try again."
+      );
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 px-4">
+      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 relative">
+        {/* Cross Icon inside the form box */}
+        <button
+          onClick={() => Navigate("/")}
+          className="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-xl"
+        >
+          <AiOutlineClose />
+        </button>
+
+        <h2 className="text-3xl font-bold text-center text-indigo-700 mb-6">
+          Welcome Back 👋
+        </h2>
+
+        <form onSubmit={loginForm} className="space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <input
+              type="password"
+              className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <a href="/register" className="text-sm text-indigo-600 hover:underline">
+              Not registered?
+            </a>
+            <button
+              type="submit"
+              className="px-5 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition duration-300"
+            >
+              Login
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }

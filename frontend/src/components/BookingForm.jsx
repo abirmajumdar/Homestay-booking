@@ -4,6 +4,7 @@ import axios from 'axios';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useNavigate } from 'react-router-dom';
 import { XIcon } from '@heroicons/react/outline'; // Importing XIcon from Heroicons
+import { BACKEND_URL } from '../utils/utils';
 
 const BookingForm = ({ isOpen, closeModal }) => {
   const [checkIn, setCheckIn] = useState(null);
@@ -20,7 +21,7 @@ const BookingForm = ({ isOpen, closeModal }) => {
 
   // Fetch unavailable dates
   useEffect(() => {
-    axios.get('http://localhost:4000/booking/unavailable-dates')
+    axios.get(`${BACKEND_URL}/booking/unavailable-dates`)
       .then(res => {
         const dates = res.data.map(date => new Date(date));
         setUnavailableDates(dates);
@@ -46,7 +47,7 @@ const BookingForm = ({ isOpen, closeModal }) => {
     const totalPrice = days * 1500; // Replace with your price per night
 
     try {
-      const res = await axios.post('http://localhost:4000/booking/book', {
+      const res = await axios.post(`${BACKEND_URL}/booking/book`, {
         ...formData,
         checkIn,
         checkOut,

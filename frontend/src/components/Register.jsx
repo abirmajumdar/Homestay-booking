@@ -1,171 +1,160 @@
 import React, { useState } from "react";
-import axios from 'axios'
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { BACKEND_URL } from "../utils/utils";
+
 export default function Register() {
-    const [name,setName] = useState()
-    const [email,setEmail] = useState()
-    const [password ,setPassword] = useState()
-    const [cnfpassword ,setCnfPassword] = useState()
-    const Navigate = useNavigate()
-    function validateUserInput(username, email, password) {
-        const errors = {};
-    
-        // Username: at least 3 characters, only alphanumeric
-        if (!/^[a-zA-Z0-9]{1,}$/.test(name)) {
-            errors.name = "Username must be at least 3 characters and alphanumeric only.";
-        }
-    
-        // Email: basic format validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            errors.email = "Invalid email format.";
-        }
-    
-        // Password: 8+ characters, includes uppercase, lowercase, number, and special character
-        const passwordRegex = /^.{5,}$/;
-        if (!passwordRegex.test(password)) {
-            errors.password = "Password must be at least 8 characters and include uppercase, lowercase, number, and special character.";
-        }
-    
-        return {
-            isValid: Object.keys(errors).length === 0,
-            errors: errors
-        };
-    }
-    
-    const registerForm=async(e)=>{
-        e.preventDefault()
-        const data = validateUserInput(name ,email,password);
-        
-        if (data.isValid) {
-            if(password !== cnfpassword){
-                alert("password mismatched")
-            }
-            else{
-               const response = await axios.post('http://localhost:4000/user/signup',{name,email,password})
-                console.log(response.data.user);
-                localStorage.setItem("User",JSON.stringify(response.data.user))
-                Navigate('/')
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    cnfpassword: "",
+  });
+  const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
-                
+  const validate = () => {
+    const { name, email, password, cnfpassword } = formData;
+    const newErrors = {};
 
-            }
-        } else {
-            if(data.errors.email ){
-                alert(data.errors.email)
-            }
-            else if(data.errors.password){
-                alert(data.errors.password)
-            }
-            else{
-                alert("invalid user input")
-            }
-        }
+    if (!name || name.length < 1) {
+      newErrors.name = "Name must be at least 1 character long.";
     }
 
-    return (
-        <div style={{
-            backgroundColor:"red",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            minHeight: "100vh",
-        }}>
-            <div className="flex flex-col items-center min-h-screen pt-6 sm:justify-center sm:pt-0 bg-gray-50">
-                <div>
-                    <a href="/">
-                        <h3 className="text-4xl font-bold text-purple-600">
-                            Logo
-                        </h3>
-                    </a>
-                </div>
-                <div className="w-full px-6 py-4 mt-6 overflow-hidden bg-white shadow-md sm:max-w-md sm:rounded-lg">
-                    <form>
-                        <div>
-                            <label
-                                htmlFor="name"
-                                className="block text-sm font-medium text-gray-700 undefined"
-                            >
-                                Name
-                            </label>
-                            <div className="flex flex-col items-start">
-                                <input
-                                    value={name}
-                                    onChange={(e)=>{setName(e.target.value)}}
-                                    type="text"
-                                    name="name"
-                                    className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                />
-                            </div>
-                        </div>
-                        <div className="mt-4">
-                            <label
-                                htmlFor="email"
-                                className="block text-sm font-medium text-gray-700 undefined"
-                            >
-                                Email
-                            </label>
-                            <div className="flex flex-col items-start">
-                                <input
-                                    value={email}
-                                    onChange={(e)=>{setEmail(e.target.value)}}
-                                    type="email"
-                                    name="email"
-                                    className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                />
-                            </div>
-                        </div>
-                        <div className="mt-4">
-                            <label
-                                htmlFor="password"
-                                className="block text-sm font-medium text-gray-700 undefined"
-                            >
-                                Password
-                            </label>
-                            <div className="flex flex-col items-start">
-                                <input
-                                    value={password}
-                                    onChange={(e)=>{setPassword(e.target.value)}}
-                                    type="password"
-                                    name="password"
-                                    className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                />
-                            </div>
-                        </div>
-                        <div className="mt-4">
-                            <label
-                                htmlFor="password_confirmation"
-                                className="block text-sm font-medium text-gray-700 undefined"
-                            >
-                                Confirm Password
-                            </label>
-                            <div className="flex flex-col items-start">
-                                <input
-                                    value={cnfpassword}
-                                    onChange={(e)=>{setCnfPassword(e.target.value)}}
-                                    type="password"
-                                    name="password_confirmation"
-                                    className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                />
-                            </div>
-                        </div>
-                        <div className="flex items-center justify-end mt-4">
-                            <a
-                                className="text-sm text-gray-600 underline hover:text-gray-900"
-                                href="#"
-                            >
-                                Already registered?
-                            </a>
-                            <button
-                                
-                                className="inline-flex items-center px-4 py-2 ml-4 text-xs font-semibold tracking-widest text-white uppercase transition duration-150 ease-in-out bg-gray-900 border border-transparent rounded-md active:bg-gray-900 false"
-                                onClick={registerForm}
-                            >
-                                Register
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    );
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      newErrors.email = "Enter a valid email address.";
+    }
+
+    if (!password || password.length < 4) {
+      newErrors.password = "Password must be at least 4 characters.";
+    }
+
+    if (password !== cnfpassword) {
+      newErrors.cnfpassword = "Passwords do not match.";
+    }
+
+    return newErrors;
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      toast.error("Please fix the highlighted errors.");
+      return;
+    }
+
+    try {
+      const res = await axios.post(`${BACKEND_URL}/user/signup`, {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      localStorage.setItem("User", JSON.stringify(res.data.user));
+      toast.success("Registration successful!");
+      setTimeout(() => navigate("/"), 1500);
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Something went wrong.");
+    }
+  };
+
+  return (
+    <div className="bg-gradient-to-r from-blue-100 to-purple-200 min-h-screen flex justify-center items-center">
+      <div className="relative bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
+        {/* Cross icon for closing */}
+        <button
+          onClick={() => navigate("/")}
+          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        <h2 className="text-3xl font-bold text-center text-indigo-700 mb-6">
+          Create an Account
+        </h2>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-gray-700 font-medium">Name</label>
+            <input
+              name="name"
+              type="text"
+              className="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-indigo-400"
+              value={formData.name}
+              onChange={handleChange}
+            />
+            {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name}</p>}
+          </div>
+
+          <div>
+            <label className="block text-gray-700 font-medium">Email</label>
+            <input
+              name="email"
+              type="email"
+              className="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-indigo-400"
+              value={formData.email}
+              onChange={handleChange}
+            />
+            {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
+          </div>
+
+          <div>
+            <label className="block text-gray-700 font-medium">Password</label>
+            <input
+              name="password"
+              type="password"
+              className="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-indigo-400"
+              value={formData.password}
+              onChange={handleChange}
+            />
+            {errors.password && <p className="text-sm text-red-500 mt-1">{errors.password}</p>}
+          </div>
+
+          <div>
+            <label className="block text-gray-700 font-medium">Confirm Password</label>
+            <input
+              name="cnfpassword"
+              type="password"
+              className="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-indigo-400"
+              value={formData.cnfpassword}
+              onChange={handleChange}
+            />
+            {errors.cnfpassword && <p className="text-sm text-red-500 mt-1">{errors.cnfpassword}</p>}
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-indigo-600 text-white font-semibold py-2 rounded hover:bg-indigo-700 transition"
+          >
+            Register
+          </button>
+        </form>
+
+        <p className="text-sm text-center text-gray-600 mt-4">
+          Already have an account?{" "}
+          <a href="/login" className="text-indigo-600 font-medium">
+            Login
+          </a>
+        </p>
+      </div>
+    </div>
+  );
 }

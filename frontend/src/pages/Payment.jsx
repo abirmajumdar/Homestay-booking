@@ -2,6 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { BACKEND_URL } from '../utils/utils';
 const Payment = () => {
   const location = useLocation()
   const { formData, checkIn, checkOut, totalPrice } = location.state || {}
@@ -9,7 +10,7 @@ const Payment = () => {
   const handlePayment = async () => {
 
     try {
-      const { data: order } = await axios.post('http://localhost:4000/api/payment', {
+      const { data: order } = await axios.post(`${BACKEND_URL}/api/payment`, {
         amount: totalPrice
       });
 
@@ -21,7 +22,7 @@ const Payment = () => {
         description: "Room Booking",
         order_id: order.id,
         handler: async function (response) {
-          const res =await axios.post('/http://localhost:4000/booking/book', {
+          const res =await axios.post(`${BACKEND_URL}/booking/book`, {
             ...formData,
             checkIn,
             checkOut,
