@@ -4,7 +4,7 @@ import Hero from '../components/Hero'
 import Footer from '../components/Footer'
 import RoomsSection from '../components/RoomImgs'
 import BookingForm from '../components/BookingForm'
-import AboutSection from '../components/About'
+import {AboutSection,FacilitiesSection} from '../components/About'
 export default function
     () {
     return (
@@ -13,6 +13,7 @@ export default function
             <Hero />
             <RoomsSection/>
             <AboutSection/>
+            <FacilitiesSection/>
             <BookingForm/>
             <Footer />
         </div>

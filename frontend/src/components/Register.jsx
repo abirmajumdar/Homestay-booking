@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import axios from 'axios'
+import { useNavigate } from "react-router-dom";
 export default function Register() {
     const [name,setName] = useState()
     const [email,setEmail] = useState()
     const [password ,setPassword] = useState()
     const [cnfpassword ,setCnfPassword] = useState()
+    const Navigate = useNavigate()
     function validateUserInput(username, email, password) {
         const errors = {};
     
@@ -43,6 +45,9 @@ export default function Register() {
                const response = await axios.post('http://localhost:4000/user/signup',{name,email,password})
                 console.log(response.data.user);
                 localStorage.setItem("User",JSON.stringify(response.data.user))
+                Navigate('/')
+
+                
 
             }
         } else {
