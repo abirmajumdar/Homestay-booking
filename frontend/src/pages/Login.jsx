@@ -1,15 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { BACKEND_URL } from "../utils/utils";
 import { toast } from "react-hot-toast";
 import { AiOutlineClose } from "react-icons/ai"; // Cross icon
 
+
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const Navigate = useNavigate();
-
   const validateInputs = () => {
     if (!email || !password) {
       toast.error("Please fill in all fields.");
@@ -38,7 +39,7 @@ export default function Login() {
 
       localStorage.setItem("User", JSON.stringify(res.data.user));
       toast.success("Login successful!");
-      Navigate("/");
+      setTimeout(() => Navigate("/"), 1500);
     } catch (error) {
       toast.error(
         error.response?.data?.error || "Invalid credentials. Please try again."

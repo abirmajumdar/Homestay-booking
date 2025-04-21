@@ -1,12 +1,12 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { BACKEND_URL } from '../utils/utils';
+import { useAuth } from '../context/AuthProvider';
 
 export default function Navbar() {
   const [name, setName] = useState();
   const [user, setUser] = useState();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   useEffect(() => {
     const fetchUserDetails = async () => {
       const storedUser = localStorage.getItem("User");

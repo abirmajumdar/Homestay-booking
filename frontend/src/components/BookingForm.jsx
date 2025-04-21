@@ -14,56 +14,62 @@ const BookingForm = ({ isOpen, closeModal }) => {
     name: '',
     email: '',
     phone: '',
-    guests: 1
+    guests: 1,
   });
   const [message, setMessage] = useState('');
   const Navigate = useNavigate();
 
   // Fetch unavailable dates
   useEffect(() => {
-    axios.get(`${BACKEND_URL}/booking/unavailable-dates`)
-      .then(res => {
-        const dates = res.data.map(date => new Date(date));
+    axios
+      .get(`${BACKEND_URL}/booking/unavailable-dates`)
+      .then((res) => {
+        const dates = res.data.map((date) => new Date(date));
         setUnavailableDates(dates);
+      })
+      .catch((err) => {
+        console.error('Error fetching unavailable dates:', err);
+        setMessage('Failed to load unavailable dates.');
       });
   }, []);
 
   const handleChange = (e) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate check-in and check-out dates
     if (!checkIn || !checkOut) {
       setMessage('Please select both check-in and check-out dates.');
       return;
     }
 
+    if (checkOut <= checkIn) {
+      setMessage('Check-out date must be after check-in date.');
+      return;
+    }
+
+    // Calculate total price based on the number of days
     const days = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
     const totalPrice = days * 1500; // Replace with your price per night
 
     try {
-      const res = await axios.post(`${BACKEND_URL}/booking/book`, {
-        ...formData,
-        checkIn,
-        checkOut,
-        totalPrice
-      });
-
-      Navigate('/payment', {
-        state: {
-          formData,
-          checkIn,
-          checkOut,
-          totalPrice
-        }
-      });
-
+        // Navigate to the payment page after successful booking
+        Navigate('/payment', {
+          state: {
+            formData,
+            checkIn,
+            checkOut,
+            totalPrice,
+          },
+        });
     } catch (err) {
+      console.log(err)
       setMessage(err.response?.data?.error || 'Booking failed');
     }
   };
@@ -115,6 +121,7 @@ const BookingForm = ({ isOpen, closeModal }) => {
               selected={checkIn}
               onChange={(date) => {
                 setCheckIn(date);
+                // If check-in is after check-out, reset check-out date
                 if (checkOut && date >= checkOut) setCheckOut(null);
               }}
               excludeDates={unavailableDates}
