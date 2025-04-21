@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { BACKEND_URL } from "../utils/utils";
 import { toast } from "react-hot-toast";
-import { AiOutlineClose } from "react-icons/ai"; // Cross icon
-
-
+import { AiOutlineClose } from "react-icons/ai";
+import { useAuth } from "../context/AuthProvider"; // ✅ Import useAuth
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
+  const { setAuthUser } = useAuth(); // ✅ Get setAuthUser from context
+
   const validateInputs = () => {
     if (!email || !password) {
       toast.error("Please fill in all fields.");
@@ -37,9 +38,14 @@ export default function Login() {
         password,
       });
 
-      localStorage.setItem("User", JSON.stringify(res.data.user));
+      const user = res.data.user;
+
+      // ✅ Update localStorage & context
+      localStorage.setItem("User", JSON.stringify(user));
+      setAuthUser(user);
+
       toast.success("Login successful!");
-      setTimeout(() => Navigate("/"), 1500);
+      setTimeout(() => navigate("/"), 1500);
     } catch (error) {
       toast.error(
         error.response?.data?.error || "Invalid credentials. Please try again."
@@ -50,9 +56,8 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 px-4">
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 relative">
-        {/* Cross Icon inside the form box */}
         <button
-          onClick={() => Navigate("/")}
+          onClick={() => navigate("/")}
           className="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-xl"
         >
           <AiOutlineClose />

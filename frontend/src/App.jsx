@@ -8,7 +8,7 @@ import { useAuth } from '../src/context/AuthProvider';
 
 function App() {
   const { authUser, loading } = useAuth(); // ✅ Destructure correctly
-
+  console.log(authUser)
   if (loading) {
     return <div>Loading...</div>; // Or use a spinner/loader component
   }
